@@ -18,7 +18,7 @@ export const signup = async (req, res) => {
             return res.status(400).json({ error: true, message: "User already exists" });
 
         const user = new User({
-            fullName,
+            name:fullName,
             email,
             password,
         });
@@ -40,12 +40,13 @@ export const signup = async (req, res) => {
     }
 };
 
+
 // Login controller
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email) return 
-        res.status(400).json({ message: "Email is required" });
+    if (!email) 
+        return res.status(400).json({ message: "Email is required" });
     if (!password) 
         return res.status(400).json({ message: "Password is required" });
 

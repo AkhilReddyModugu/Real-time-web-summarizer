@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/Input/PasswordInput';
 import { validateEmail } from '../../utils/helper.js';
-import axiosInstance from '../../utils/axiosInstance';
+import axios from 'axios';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -11,7 +11,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
 
-  const navigate= useNavigate();
+  const navigate = useNavigate();
   
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -39,87 +39,90 @@ const Signup = () => {
     setError('');
 
     // Signup API call
-    try{
-      const response= await axiosInstance.post("/create-account",{
-          fullName:name,
-          email:email,
-          password:password
+    try {
+      const response = await axios.post('http://localhost:5001/api/auth/signup', {
+        fullName: name,
+        email: email,
+        password: password
       });
 
       // Handle successful signup response
-      if(response.data && response.data.error){
+      if (response.data && response.data.error) {
         setError(response.data.message);
-        return ;
+        return;
       }
 
-      if(response.data && response.data.accessToken){
-          localStorage.setItem("token",response.data.accessToken);
-          navigate("/dashboard");
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem('token', response.data.accessToken);
+        navigate('/search');
       }
-    }
-    catch(error){
-        // Handle login error
-        if(error.response && error.response.data && error.response.data.message){
-            setError(error.response.data.message);
-        }
-        else    
-            setError("An Unexpected Error occurred while logging in");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('An unexpected error occurred while signing up');
+      }
     }
   };
 
   return (
-    <>
-      {/* <Navbar /> */}
-
-      <div className='flex items-center justify-center mt-28'>
-        <div className='w-96 border rounded bg-white px-7 py-10'>
-          <form onSubmit={handleSignup}>
-            <h4 className='text-2xl mb-7'>Sign Up</h4>
-            
+    <div className='flex items-center justify-center mt-24'>
+      <div className='w-96 bg-white border rounded-lg shadow-lg p-8'>
+        <h2 className='text-3xl font-semibold text-center mb-6'>Sign Up</h2>
+        <form onSubmit={handleSignup}>
+          <div className='mb-4'>
             <input
               type='text'
-              placeholder='Name'
-              className='input-box'
+              placeholder='Enter your name'
+              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            
+          </div>
+
+          <div className='mb-4'>
             <input
-              type='text'
-              placeholder='Email'
-              className='input-box'
+              type='email'
+              placeholder='Enter your email'
+              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            
+          </div>
+
+          <div className='mb-4'>
             <PasswordInput
               placeholder='Password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            
+          </div>
+
+          <div className='mb-6'>
             <PasswordInput
               placeholder='Confirm Password'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
+          </div>
 
-            {error && <p className='text-red-500 text-xs pb-1'>{error}</p>}
+          {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
 
-            <button type='submit' className='btn-primary'>
-              Sign Up
-            </button>
+          <button type='submit' className='w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-primary-dark transition'>
+            Sign Up
+          </button>
 
-            <p className='text-sm text-center mt-4'>
+          <div className='text-center mt-4'>
+            <p className='text-sm'>
               Already have an account?{' '}
-              <Link to='/login' className='font-medium text-primary underline'>
+              <Link to='/login' className='text-primary font-medium hover:underline'>
                 Login
               </Link>
             </p>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
