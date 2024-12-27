@@ -18,21 +18,45 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 
 app.post('/api/summarize', async (req, res) => {
-  const { query } = req.body;
+  const { query, length } = req.body;
 
   if (!query) {
     return res.status(400).json({ error: 'Query is required' });
   }
 
+  if (!length) {
+    return res.status(400).json({ error: 'Length is required' });
+  }
+
   try {
-    // Sending the request to FastAPI server
-    const summarizationResponse = await axios.post(`${fastAPIServer}/summarize`, { query });
-    res.json({ summary: summarizationResponse.data.summary });
+    const summarizationResponse = await axios.post(`${fastAPIServer}/summarize`, { query, length });
+    res.json({
+      summary: summarizationResponse.data.summary,
+      image_url: summarizationResponse.data.image_url
+    });
   } catch (error) {
     console.error('Error from FastAPI server:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Error occurred while processing the request' });
+
+    if (error.response && error.response.data && error.response.data.detail) {
+      const detail = error.response.data.detail;
+
+      let userFriendlyMessage;
+
+      if (detail.includes('Failed to fetch sufficient data')) {
+        userFriendlyMessage =
+          'We could not gather enough relevant information for your query. Please try refining your search with more specific keywords.';
+      } else {
+        userFriendlyMessage = 'An unexpected error occurred. Please try again later.';
+      }
+
+      res.status(500).json({ error: userFriendlyMessage });
+    } else {
+      res.status(500).json({ error: 'An error occurred while processing your request. Please try again later.' });
+    }
   }
 });
+
+
 
 app.get('/', (req, res) => {
   res.send('Hello, world! This is your Node.js server!');
