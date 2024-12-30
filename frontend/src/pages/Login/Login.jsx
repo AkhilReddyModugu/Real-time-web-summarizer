@@ -12,7 +12,7 @@ const Login = () => {
   const {login}= useContext(AuthContext);
   
   const navigate = useNavigate();
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateEmail(email)) {

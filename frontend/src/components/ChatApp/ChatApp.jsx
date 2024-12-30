@@ -9,6 +9,7 @@ const ChatApp = () => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [allChats, setAllChats] = useState([]);
 
+  
   useEffect(() => {
     if (userDetails && userDetails.id) {
       const fetchChats = async () => {
