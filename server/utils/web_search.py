@@ -37,14 +37,16 @@ async def fetch_and_extract_paragraphs(url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status != 200:
-                    print(f"Failed to retrieve the page {url}. Status code: {response.status}")
+                    print(f"Failed to retrieve the page {url}")
+                    # print(f"Failed to retrieve the page {url}. Status code: {response.status}")
                     return None
                 
                 soup = BeautifulSoup(await response.text(), 'html.parser')
                 paragraphs = soup.find_all('p')
                 return "\n".join(para.get_text() for para in paragraphs)
     except Exception as e:
-        print(f"Error fetching {url}: {e}")
+        print(f"Error fetching {url}")
+        # print(f"Error fetching {url}: {e}")
         return None
 
 # Function to clean the text corpus

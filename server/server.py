@@ -47,7 +47,8 @@ def fetch_data(link):
             raise ValueError(f"No content fetched from {link}")
         return content
     except Exception as e:
-        raise RuntimeError(f"Error fetching {link}: {e}")
+        # raise RuntimeError(f"Error fetching {link}: {e}")
+        raise RuntimeError(f"Error fetching {link}")
 
 @app.get("/")
 async def read_root():
@@ -83,7 +84,8 @@ async def summarize(search_request: SearchRequest):
                 result = future.result()
                 results.append(result)
             except Exception as e:
-                print(f"Fetching failed for {link}: {e}")
+                print(f"Fetching failed for {link}")
+                # print(f"Fetching failed for {link}: {e}")
                 failure_count += 1
                 # Check if failure threshold is exceeded
                 if failure_count >= failure_threshold:
