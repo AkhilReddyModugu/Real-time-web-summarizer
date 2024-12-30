@@ -33,6 +33,11 @@ export const signup = async (req, res) => {
             error: false,
             message: "Registration successful",
             accessToken,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            },
         });
     } catch (err) {
         console.error(err);
@@ -65,6 +70,11 @@ export const login = async (req, res) => {
                 error: false,
                 message: "Login successful",
                 accessToken,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                },
             });
         } else {
             return res.status(400).json({

@@ -5,11 +5,13 @@ import axios from 'axios';
 
 import connectDB from './config/db.js';
 import authRouter from './src/routes/authRouter.js';
+import sendEmail from './src/controllers/sendEmailController.js';
+import chatRouter from './src/routes/chatRouter.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5001; 
 const fastAPIServer = process.env.FASTAPI_SERVER || 'http://localhost:8000';
 
 app.use(express.json());
@@ -17,6 +19,11 @@ app.use(cors());
 
 app.use("/api/auth", authRouter);
 
+app.use("/api/chat",chatRouter);
+
+app.post('/api/send-email',sendEmail);
+
+// Summarize: request to python server
 app.post('/api/summarize', async (req, res) => {
   const { query, length } = req.body;
 
@@ -55,8 +62,6 @@ app.post('/api/summarize', async (req, res) => {
     }
   }
 });
-
-
 
 app.get('/', (req, res) => {
   res.send('Hello, world! This is your Node.js server!');
