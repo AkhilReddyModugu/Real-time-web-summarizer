@@ -9,7 +9,8 @@ import ContactPage from './pages/Contact/Contact';
 import AboutPage from './pages/About/About';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import Home from './pages/Home/Home';
-import Footer from './components/Footer/Footer';
+// import Footer from './components/Footer/Footer';
+import ChatApp from './components/ChatApp/ChatApp';
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
         <div className="App">
           <Navbar />
           <AppRoutes />
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </Router>
     </AuthProvider>
@@ -32,13 +33,14 @@ const AppRoutes = () => {
     <div className="container mx-auto p-4">
       <Routes>
         <Route path="/" 
-          element={isLoggedIn ? <SearchPage /> : <Home />} 
+          element={isLoggedIn ? <ChatApp /> : <Home />} 
         />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/chat" element={<SearchPage/>} />
       </Routes>
     </div>
   );

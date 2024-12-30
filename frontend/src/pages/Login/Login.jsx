@@ -32,7 +32,7 @@ const Login = () => {
       });
       
       if (response.data && response.data.accessToken) {
-        const user={email};
+        const user= response.data.user;
 
         login(response.data.accessToken,user);
         navigate('/');

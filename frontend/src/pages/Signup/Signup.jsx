@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/Input/PasswordInput';
 import { validateEmail } from '../../utils/helper.js';
 import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -10,6 +11,7 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const {login}= useContext(AuthContext);
 
   const navigate = useNavigate();
   
@@ -53,8 +55,10 @@ const Signup = () => {
       }
 
       if (response.data && response.data.accessToken) {
-        localStorage.setItem('token', response.data.accessToken);
-        navigate('/search');
+        const user= response.data.user;
+
+        login(response.data.accessToken,user);
+        navigate('/');
       }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
