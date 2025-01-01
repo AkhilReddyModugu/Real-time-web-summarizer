@@ -39,7 +39,7 @@ app.post('/api/summarize', async (req, res) => {
     const summarizationResponse = await axios.post(`${fastAPIServer}/summarize`, { query, length });
     res.json({
       summary: summarizationResponse.data.summary,
-      image_url: summarizationResponse.data.image_url
+      image_urls: summarizationResponse.data.image_urls || []
     });
   } catch (error) {
     console.error('Error from FastAPI server:', error.response ? error.response.data : error.message);

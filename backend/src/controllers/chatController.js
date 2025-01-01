@@ -84,7 +84,7 @@ export const getMessages = async (req, res) => {
 // Send a message to a specific chat
 export const sendMessage = async (req, res) => {
   const { chatId } = req.params;
-  const { sender, content } = req.body; // sender: 'user' or 'model'
+  const { sender, content, images} = req.body; // sender: 'user' or 'model'
 
   if (!content || !sender) {
     return res.status(400).json({ error: 'Sender and content are required' });
@@ -101,6 +101,7 @@ export const sendMessage = async (req, res) => {
       chat: chatId,
       sender,
       content,
+      images
     });
 
     // Save the message to the database
