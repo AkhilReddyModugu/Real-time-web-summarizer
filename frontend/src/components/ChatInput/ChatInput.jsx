@@ -9,6 +9,7 @@ const ChatInput = ({ onSendMessage }) => {
   const [summaryLength, setSummaryLength] = useState('');
 
   const handleSend = async () => {
+    // Check if the query is empty or if the summary length is not selected
     if (query.trim() === '') {
       setErrorMessage('Please enter a message');
       return;
@@ -17,14 +18,14 @@ const ChatInput = ({ onSendMessage }) => {
       setErrorMessage('Please select a summary length');
       return;
     }
-    setErrorMessage('');
+    setErrorMessage(''); // Reset error message
     setLoading(true);
   
-    // Set the query message in the chat state
-    onSendMessage(query.trim(), true); // This triggers the state update in the parent component
+    // Send the user's query to the chat
+    onSendMessage(query.trim(), true); // 'true' to indicate it's the user's message
   
-    // Make the backend call to get the summary
-    const api = `http://localhost:5001/api/summarize`;  // Update the API endpoint accordingly
+    // API call to get the summary from the backend
+    const api = `http://localhost:5001/api/summarize`; // Replace with your correct API URL
     const body = {
       query: query.trim(),
       length: summaryLength === 'small' ? 200 : summaryLength === 'medium' ? 450 : 700,
@@ -33,18 +34,20 @@ const ChatInput = ({ onSendMessage }) => {
     try {
       const response = await axios.post(api, body);
   
-      // Send the response message (summary) to the chat
-      onSendMessage(response.data.summary, false);
+      // On success, send the response (summary) to the chat
+      onSendMessage(response.data.summary, false); // 'false' to indicate it's a bot response
     } catch (error) {
       console.error('Error:', error);
       if (error.response) {
-        setErrorMessage(error.response.data.error || 'An unexpected error occurred.');
+        // Send backend error message to the chat
+        onSendMessage(error.response.data.error, false);
       } else {
-        setErrorMessage('Network error. Please check your connection.');
+        // If it's a network issue, send a general error message
+        onSendMessage('Network error. Please check your connection.', false);
       }
     } finally {
-      setLoading(false);
-      setQuery('');
+      setLoading(false); // Reset loading state
+      setQuery(''); // Clear the input field
     }
   };
   

@@ -91,6 +91,7 @@ const ChatApp = () => {
         selectChat={selectChat}
         onDeleteChat={handleDeleteChat}
         onEditChatName={handleEditChatName}
+        createNewChat={createNewChat}
       />
       <ChatWindow
         selectedChat={selectedChat}

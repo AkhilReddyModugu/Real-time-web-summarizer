@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaPencilAlt, FaTrash, FaCheck } from 'react-icons/fa';
 
-const ChatList = ({ chats = [], selectChat, onDeleteChat, onEditChatName }) => {
+const ChatList = ({ chats = [], selectChat, onDeleteChat, onEditChatName, createNewChat }) => {
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState('');
 
@@ -16,8 +16,17 @@ const ChatList = ({ chats = [], selectChat, onDeleteChat, onEditChatName }) => {
   };
 
   return (
-    <div className="w-1/4 bg-gray-800 p-4 overflow-y-auto h-full ">
-      <h2 className="text-white text-xl mb-4">Chats</h2>
+    <div className="w-1/4 bg-gray-800 p-2 overflow-y-auto h-full ">
+      <div className="flex justify-between items-center p-2">
+        <h2 className="text-white text-xl mb-4">Chats</h2>
+        <button
+          className="text-white bg-gray-400 p-2"
+          onClick={createNewChat}
+        >
+          New Chat
+        </button>  
+      </div>
+
       <ul className="space-y-2">
         {chats.map((chat) => (
           <li
