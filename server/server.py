@@ -5,7 +5,6 @@ import os
 from dotenv import load_dotenv
 import asyncio
 import uvicorn
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 from utils.web_search import (
@@ -15,6 +14,7 @@ from utils.web_search import (
     clean_text_corpus,
     llm_summarize,
     save_links_to_file,
+    fetch_image_urls, 
 )
 
 load_dotenv()
@@ -27,27 +27,25 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins, change this to specific origins in production
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 
-# Define the request body using Pydantic
 class SearchRequest(BaseModel):
     query: str
     length: int
 
 # Function to fetch data from a link
-def fetch_data(link):
+async def fetch_data(link):
     try:
-        content = asyncio.run(fetch_and_extract_paragraphs(link))
+        content = await fetch_and_extract_paragraphs(link)
         if content is None:
             raise ValueError(f"No content fetched from {link}")
         return content
     except Exception as e:
-        # raise RuntimeError(f"Error fetching {link}: {e}")
-        raise RuntimeError(f"Error fetching {link}")
+        raise RuntimeError(f"Error fetching {link}: {str(e)}")
 
 @app.get("/")
 async def read_root():
@@ -72,24 +70,32 @@ async def summarize(search_request: SearchRequest):
     
     print(f"Found {len(links)} links")
 
-    # Fetch data from all links concurrently using asyncio.gather
-    tasks = [fetch_and_extract_paragraphs(link) for link in links]
+    # Fetch data and image URLs concurrently
     try:
-        results = await asyncio.gather(*tasks)
+        # Use asyncio.gather to fetch data concurrently
+        results = await asyncio.gather(*[fetch_data(link) for link in links])
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during data fetching: {str(e)}")
 
-    text_corpus = "\n".join(filter(None, results))
+    # Separate text corpus and image URLs
+    text_corpus = "\n".join(filter(None, (result[0] for result in results)))
+    image_urls = await fetch_image_urls(search_string, API_KEY, SEARCH_ENGINE_ID)  # Fetch images for the query
+    
+    # Filter image URLs to only include valid image URLs
+    valid_image_urls = [url for url in image_urls if url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+
     cleaned_text = clean_text_corpus(text_corpus)
     
     print("Time for scraping: ", time.time() - start)
 
-    summary = llm_summarize(text=cleaned_text, search_query=search_string, length=length)
+    # Generate summary using LLM
+    summary = await llm_summarize(text=cleaned_text, search_query=search_string, length=length)
 
+    # Write the summary to a text file
     with open("summary.txt", 'w') as f:
         f.write(summary)
 
-    return {"summary": summary}
+    return {"summary": summary, "image_urls": valid_image_urls}
 
 
 if __name__ == "__main__":
