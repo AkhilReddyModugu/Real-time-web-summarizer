@@ -16,7 +16,7 @@ const ChatList = ({ chats = [], selectChat, onDeleteChat, onEditChatName, create
   };
 
   return (
-    <div className="w-1/4 bg-gray-800 p-2 overflow-y-auto h-full ">
+    <div className="w-1/4 bg-gray-800 p-2 overflow-y-auto h-full rounded-l-lg">
       <div className="flex justify-between items-center p-2">
         <h2 className="text-white text-xl mb-4">Chats</h2>
         <button

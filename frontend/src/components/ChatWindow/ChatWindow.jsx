@@ -53,7 +53,7 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
   };
 
   return (
-    <div className="w-3/4 bg-gray-100 flex flex-col h-full">
+    <div className="w-3/4 bg-gray-100 flex flex-col h-full rounded-r-lg overflow-hidden">
       {selectedChat ? (
         <>
           {/* Header Section */}
