@@ -19,10 +19,11 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
           const response = await axios.get(
             `http://localhost:5001/api/chat/${selectedChat._id}/messages`
           );
-          // Map messages to identify the sender
+          // Map messages to identify the sender and add images if present
           setMessages(
             response.data.map((msg) => ({
               text: msg.content,
+              images: msg.images || [], // Images field is optional
               isUser: msg.sender === 'user', // Check if the sender is 'user'
             }))
           );
@@ -35,10 +36,11 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
     fetchMessages();
   }, [selectedChat]);
 
-  const handleSendMessage = (messageText, isUserMessage) => {
+  const handleSendMessage = (messageText, image_urls = [], isUserMessage) => {
     if (messageText.trim()) {
       const newMessage = {
         text: messageText,
+        image_urls: image_urls,
         isUser: isUserMessage,
       };
 
@@ -62,15 +64,31 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
           {/* Messages Section */}
           <div className="flex-grow overflow-y-auto p-4 space-y-2 bg-gray-100">
             {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`p-2 rounded-lg max-w-max ${
-                  message.isUser
-                    ? 'bg-blue-500 text-white ml-auto w-4/6' // User's message
-                    : 'bg-gray-200 text-black mr-auto w-4/6' // Model's message
-                }`}
-              >
-                {message.text}
+              <div key={index} className="space-y-2">
+                {/* Display images if available */}
+                {message.images &&
+                  message.images.length > 0 && (
+                    <div className="flex space-x-2 mt-2">
+                      {message.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt={`response-image-${idx}`}
+                          className="rounded-lg w-64 h-64 object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                <div
+                  className={`p-2 rounded-lg max-w-max ${
+                    message.isUser
+                      ? 'bg-blue-500 text-white ml-auto w-4/6' // User's message
+                      : 'bg-gray-200 text-black mr-auto w-4/6' // Model's message
+                  }`}
+                >
+                  {message.text}
+                </div>
               </div>
             ))}
             <div ref={bottomRef}></div>

@@ -7,6 +7,7 @@ const ChatInput = ({ onSendMessage }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [summaryLength, setSummaryLength] = useState('');
+  const [images, setImages] = useState([]); // State for images
 
   const handleSend = async () => {
     // Check if the query is empty or if the summary length is not selected
@@ -20,37 +21,37 @@ const ChatInput = ({ onSendMessage }) => {
     }
     setErrorMessage(''); // Reset error message
     setLoading(true);
-  
+
     // Send the user's query to the chat
-    onSendMessage(query.trim(), true); // 'true' to indicate it's the user's message
-  
+    onSendMessage(query.trim(), images, true); // 'true' to indicate it's the user's message
+
     // API call to get the summary from the backend
     const api = `http://localhost:5001/api/summarize`; // Replace with your correct API URL
     const body = {
       query: query.trim(),
       length: summaryLength === 'small' ? 200 : summaryLength === 'medium' ? 450 : 700,
     };
-  
+
     try {
       const response = await axios.post(api, body);
-  
+
       // On success, send the response (summary) to the chat
-      onSendMessage(response.data.summary, false); // 'false' to indicate it's a bot response
+      onSendMessage(response.data.summary, response.data.image_urls, false); // 'false' to indicate it's a bot response
     } catch (error) {
       console.error('Error:', error);
       if (error.response) {
         // Send backend error message to the chat
-        onSendMessage(error.response.data.error, false);
+        onSendMessage(error.response.data.error, [], false);
       } else {
         // If it's a network issue, send a general error message
-        onSendMessage('Network error. Please check your connection.', false);
+        onSendMessage('Network error. Please check your connection.', [], false);
       }
     } finally {
       setLoading(false); // Reset loading state
       setQuery(''); // Clear the input field
+      setImages([]); // Reset images
     }
   };
-  
 
   return (
     <div className="flex items-center space-x-2 bg-gray-200 p-4 flex-none">

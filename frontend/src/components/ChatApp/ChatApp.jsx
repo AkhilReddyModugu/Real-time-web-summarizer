@@ -50,13 +50,14 @@ const ChatApp = () => {
 
   const handleSendMessage = async (newMessage, isUser) => {
     if (!selectedChat) return;
-
+  
     try {
       const response = await axios.post(`http://localhost:5001/api/chat/${selectedChat._id}/messages`, {
         sender: isUser ? 'user' : 'model',
         content: newMessage.text,
+        images: newMessage.image_urls, // Send images as part of the message
       });
-
+  
       setSelectedChat((prevChat) => ({
         ...prevChat,
         messages: [...prevChat.messages, response.data],
@@ -65,6 +66,7 @@ const ChatApp = () => {
       console.error('Error sending message:', error);
     }
   };
+  
 
   const selectChat = (chat) => {
     setSelectedChat(chat);
