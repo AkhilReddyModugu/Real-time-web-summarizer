@@ -8,3 +8,5 @@ aiohttp
 openai
 numpy
 scikit-learn
+transformers
+torch
