@@ -8,3 +8,4 @@ aiohttp
 openai
 numpy
 scikit-learn
+nltk

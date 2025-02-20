@@ -12,9 +12,8 @@ from utils.web_search import (
     extract_links,
     fetch_and_extract_paragraphs,
     clean_text_corpus,
-    llm_summarize,
-    save_links_to_file,
-    fetch_image_urls, 
+    summarize_text_abstractive,  # Updated abstractive summarization function
+    save_links_to_file
 )
 
 load_dotenv()
@@ -27,10 +26,10 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],  # Allows all origins; change in production
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 class SearchRequest(BaseModel):
@@ -40,7 +39,7 @@ class SearchRequest(BaseModel):
 # Function to fetch data from a link
 async def fetch_data(link):
     try:
-        content = await fetch_and_extract_paragraphs(link)
+        content, _ = await fetch_and_extract_paragraphs(link)
         if content is None:
             raise ValueError(f"No content fetched from {link}")
         return content
@@ -57,46 +56,33 @@ async def summarize(search_request: SearchRequest):
     length = search_request.length
     
     print(f"Searching for: {search_string}")
-    
     try:
         start = time.time()
         search_result = await search_query(search_string, length, API_KEY, SEARCH_ENGINE_ID)
-    
         links = extract_links(search_result)
-        
         save_links_to_file(links)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during search or link extraction: {str(e)}")
     
     print(f"Found {len(links)} links")
 
-    # Fetch data and image URLs concurrently
     try:
-        # Use asyncio.gather to fetch data concurrently
         results = await asyncio.gather(*[fetch_data(link) for link in links])
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during data fetching: {str(e)}")
 
-    # Separate text corpus and image URLs
-    text_corpus = "\n".join(filter(None, (result[0] for result in results)))
-    image_urls = await fetch_image_urls(search_string, API_KEY, SEARCH_ENGINE_ID)  # Fetch images for the query
-    
-    # Filter image URLs to only include valid image URLs
-    valid_image_urls = [url for url in image_urls if url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
-
+    text_corpus = "\n".join(filter(None, results))
     cleaned_text = clean_text_corpus(text_corpus)
     
     print("Time for scraping: ", time.time() - start)
 
-    # Generate summary using LLM
-    summary = await llm_summarize(text=cleaned_text, search_query=search_string, length=length)
+    # Generate abstractive summary using Hugging Face Transformers
+    summary = summarize_text_abstractive(cleaned_text, length)
 
-    # Write the summary to a text file
     with open("summary.txt", 'w') as f:
         f.write(summary)
 
-    return {"summary": summary, "image_urls": valid_image_urls}
-
+    return {"summary": summary}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
