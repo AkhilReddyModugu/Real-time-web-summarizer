@@ -4,9 +4,9 @@ const About = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-4xl bg-white border rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-semibold text-center mb-6">About Real-Time Web Summarizer</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6">About ConciseWeb</h2>
         <p className="text-lg mb-4">
-          The <strong>Real-Time Web Summarizer</strong> is a powerful tool that helps you quickly search and condense content from across the web into concise, easy-to-read summaries. 
+          The <strong>ConciseWeb: A Real-Time Web Summarizer</strong> is a powerful tool that helps you quickly search and condense content from across the web into concise, easy-to-read summaries. 
         </p>
         <p className="text-lg mb-4">
           Whether you're researching a topic, reading articles, or browsing blogs, our tool streamlines the process by providing summarized versions of web pages in real-time. Simply enter a search query, let the tool gather and analyze the data, and receive a summarized output in seconds.

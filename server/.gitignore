@@ -11,6 +11,7 @@ myenv/
 # Output and logs
 output.txt
 summary.txt
+notes.txt
 
 # IDE/editor config
 .vscode/
