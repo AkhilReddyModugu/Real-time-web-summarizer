@@ -30,7 +30,7 @@ const AppRoutes = () => {
   const { isLoggedIn } = useContext(AuthContext); 
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="">
       <Routes>
         <Route path="/" 
           element={isLoggedIn ? <ChatApp /> : <Home />} 

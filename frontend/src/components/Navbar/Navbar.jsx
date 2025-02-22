@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { Brain } from 'lucide-react';
 
 const Navbar = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -12,33 +13,50 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-800 p-4 shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="text-2xl font-semibold text-white">
-          <Link to="/">ConciseWeb</Link>
+    <nav className="bg-indigo-100 py-4 shadow-md border-b">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
+        <div className="flex items-center space-x-2">
+          <Brain className="w-6 h-6 text-black" />
+          <Link to="/" className="text-2xl font-semibold text-indigo-600 hover:text-indigo-800 no-underline">
+            ConciseWeb
+          </Link>
         </div>
 
-        <div className="space-x-6 text-lg">
-          <Link to="/" className="text-white hover:text-primary font-medium transition-colors">
-            Home
-          </Link>
-          <Link to="/contact" className="text-white hover:text-primary font-medium transition-colors">
-            Contact
-          </Link>
-          <Link to="/about" className="text-white hover:text-primary font-medium transition-colors">
+        <div className="flex space-x-4 text-lg">
+          <Link 
+            to="/about" 
+            className="px-4 py-2 rounded-md bg-black text-blue-400 border border-transparent hover:bg-white border-indigo-600 transition-colors no-underline"
+          >
             About
+          </Link>
+          <Link 
+            to="/contact" 
+            className="px-4 py-2 rounded-md bg-black text-blue-400 border border-transparent hover:bg-white border-indigo-600 transition-colors no-underline"
+          >
+            Contact
           </Link>
 
           {isLoggedIn ? (
-            <>
-              <button className="text-red-500 text-lg" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
+            <button 
+              onClick={handleLogout} 
+              className="px-4 py-2 rounded-md bg-red-500 text-white border border-transparent hover:border-red-600 transition-colors"
+            >
+              Logout
+            </button>
           ) : (
             <>
-              <Link to="/login" className="text-white">Login</Link>
-              <Link to="/signup" className="text-white">Signup</Link>
+              <Link 
+                to="/login" 
+                className="px-4 py-2 rounded-md bg-white border border-transparent text-blue-400 hover:text-indigo-500 hover:border-indigo-600 transition-colors no-underline"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/signup" 
+                className="px-4 py-2 rounded-md bg-black text-white border border-transparent hover:bg-gray-700 text-indigo-500 hover:border-indigo-600 transition-colors no-underline"
+              >
+                Sign Up
+              </Link>
             </>
           )}
         </div>

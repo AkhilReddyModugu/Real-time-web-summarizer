@@ -9,7 +9,6 @@ const ChatApp = () => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [allChats, setAllChats] = useState([]);
 
-  
   useEffect(() => {
     if (userDetails && userDetails.id) {
       const fetchChats = async () => {
@@ -66,7 +65,34 @@ const ChatApp = () => {
       console.error('Error sending message:', error);
     }
   };
-  
+
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/chat/message/${messageId}`);
+      setSelectedChat((prevChat) => ({
+        ...prevChat,
+        messages: prevChat.messages.filter((msg) => msg._id !== messageId),
+      }));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
+
+  const handleEditMessage = async (messageId, newText) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/chat/message/${messageId}`, {
+        content: newText,
+      });
+      setSelectedChat((prevChat) => ({
+        ...prevChat,
+        messages: prevChat.messages.map((msg) =>
+          msg._id === messageId ? { ...msg, content: response.data.content } : msg
+        ),
+      }));
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+  };
 
   const selectChat = (chat) => {
     setSelectedChat(chat);
@@ -98,6 +124,8 @@ const ChatApp = () => {
       <ChatWindow
         selectedChat={selectedChat}
         onSendMessage={handleSendMessage}
+        onDeleteMessage={handleDeleteMessage}
+        onEditMessage={handleEditMessage}
         onCreateNewChat={createNewChat}
       />
     </div>

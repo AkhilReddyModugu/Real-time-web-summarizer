@@ -9,8 +9,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const {login}= useContext(AuthContext);
-  
+  const { login } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -24,17 +24,17 @@ const Login = () => {
       return;
     }
     setError('');
-    
+
     try {
       const response = await axios.post('http://localhost:5001/api/auth/login', {
         email: email,
-        password: password
+        password: password,
       });
-      
-      if (response.data && response.data.accessToken) {
-        const user= response.data.user;
 
-        login(response.data.accessToken,user);
+      if (response.data && response.data.accessToken) {
+        const user = response.data.user;
+
+        login(response.data.accessToken, user);
         navigate('/');
       }
     } catch (error) {
@@ -47,38 +47,45 @@ const Login = () => {
   };
 
   return (
-    <div className='flex items-center justify-center mt-24'>
-      <div className='w-96 bg-white border rounded-lg shadow-lg p-8'>
-        <h2 className='text-3xl font-semibold text-center mb-6'>Login</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">Welcome back</h2>
+        <p className="text-gray-500 text-center mb-6">Enter your credentials to access your account</p>
         <form onSubmit={handleLogin}>
-          <div className='mb-4'>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Email</label>
             <input
-              type='email'
-              placeholder='Enter your email'
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+              type="email"
+              placeholder="name@example.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          <div className='mb-6'>
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-1">Password</label>
             <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
             />
           </div>
 
-          {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-          <button type='submit' className='w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-primary-dark transition'>
-            Login
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-800 transition"
+          >
+            Sign In
           </button>
 
-          <div className='text-center mt-4'>
-            <p className='text-sm'>
-              Not Registered Yet?{' '}
-              <Link to='/signup' className='text-primary font-medium hover:underline'>
-                Create an Account
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-500">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-gray-800 font-medium hover:underline">
+                Sign up
               </Link>
             </p>
           </div>

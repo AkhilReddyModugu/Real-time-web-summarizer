@@ -19,12 +19,11 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
           const response = await axios.get(
             `http://localhost:5001/api/chat/${selectedChat._id}/messages`
           );
-          // Map messages to identify the sender and add images if present
           setMessages(
             response.data.map((msg) => ({
               text: msg.content,
-              images: msg.images || [], // Images field is optional
-              isUser: msg.sender === 'user', // Check if the sender is 'user'
+              images: msg.images || [],
+              isUser: msg.sender === 'user',
             }))
           );
         }
@@ -37,74 +36,73 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
   }, [selectedChat]);
 
   const handleSendMessage = (messageText, image_urls = [], isUserMessage) => {
-    if (messageText.trim()) {
+    if (messageText.trim() || image_urls.length > 0) {
       const newMessage = {
         text: messageText,
-        image_urls: image_urls,
+        images: image_urls,
         isUser: isUserMessage,
       };
-
-      // Optimistically update local state
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-      // Notify parent component of new message
       onSendMessage(newMessage, isUserMessage);
     }
   };
 
   return (
-    <div className="w-3/4 bg-gray-100 flex flex-col h-full rounded-r-lg overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white">
       {selectedChat ? (
         <>
-          {/* Header Section */}
-          <div className="p-4 bg-gray-400 text-lg font-semibold flex-none">
-            {selectedChat.name}
+          <div className="px-6 py-4 border-t-black border-b border-gray-200 bg-slate-300">
+            <h2 className="text-xl font-semibold text-gray-800">{selectedChat.name}</h2>
           </div>
 
-          {/* Messages Section */}
-          <div className="flex-grow overflow-y-auto p-4 space-y-2 bg-gray-100">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message, index) => (
-              <div key={index} className="space-y-2">
-                {/* Display images if available */}
-                {message.images &&
-                  message.images.length > 0 && (
-                    <div className="flex space-x-2 mt-2">
+              <div
+                key={index}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`max-w-[70%] space-y-2`}>
+                  {message.images && message.images.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2">
                       {message.images.map((img, idx) => (
                         <img
                           key={idx}
                           src={img}
                           alt={`response-image-${idx}`}
-                          className="rounded-lg w-64 h-64 object-cover"
+                          className="rounded-lg w-full h-48 object-cover"
                         />
                       ))}
                     </div>
                   )}
-
-                <div
-                  className={`p-2 rounded-lg max-w-max ${
-                    message.isUser
-                      ? 'bg-blue-500 text-white ml-auto w-4/6' // User's message
-                      : 'bg-gray-200 text-black mr-auto w-4/6' // Model's message
-                  }`}
-                >
-                  {message.text}
+                  <div
+                    className={`p-4 rounded-2xl ${
+                      message.isUser
+                        ? 'bg-blue-600 text-white ml-auto'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">{message.text}</p>
+                  </div>
                 </div>
               </div>
             ))}
-            <div ref={bottomRef}></div>
+            <div ref={bottomRef} />
           </div>
 
           <ChatInput onSendMessage={handleSendMessage} />
         </>
       ) : (
-        <div className="flex-grow flex flex-col items-center justify-center text-gray-500">
-          <p className="block">Select a chat to start messaging</p>
-          <button
-            onClick={onCreateNewChat}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
-          >
-            New Chat
-          </button>
+        <div className="flex-1 flex flex-col items-center justify-center p-6">
+          <div className="text-center space-y-4">
+            <h3 className="text-xl font-semibold text-gray-800">Welcome to Chat</h3>
+            <p className="text-gray-500">Select a chat to start messaging or create a new one</p>
+            <button
+              onClick={onCreateNewChat}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Start New Chat
+            </button>
+          </div>
         </div>
       )}
     </div>

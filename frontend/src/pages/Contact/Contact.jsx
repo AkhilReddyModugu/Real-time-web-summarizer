@@ -32,12 +32,8 @@ const Contact = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-4xl bg-white border rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-semibold text-center mb-6">Contact Us</h2>
-
-        <p className="text-lg mb-4">
-          We’d love to hear from you! If you have any questions, feedback, or suggestions, please don’t hesitate to reach out.
-        </p>
+      <div className="w-full max-w-md bg-white border rounded-lg shadow-md p-8">
+        <h2 className="text-3xl font-bold mb-6">Contact Us</h2>
 
         {indicator && (
           <p className={`text-sm mb-4 ${success ? 'text-green-500' : 'text-red-500'}`}>
@@ -47,27 +43,30 @@ const Contact = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
+            <label className="block text-sm font-semibold mb-1">Name</label>
             <input
               type="text"
-              placeholder="Your Name"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Your name"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-semibold mb-1">Email</label>
             <input
               type="email"
-              placeholder="Your Email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="your@email.com"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-semibold mb-1">Message</label>
             <textarea
-              placeholder="Your Message"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="How can we help you?"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows="4"
@@ -75,7 +74,7 @@ const Contact = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-primary-dark transition"
+            className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-800 transition"
           >
             Send Message
           </button>

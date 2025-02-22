@@ -11,10 +11,10 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
-  const {login}= useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const navigate = useNavigate();
-  
+
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -40,7 +40,6 @@ const Signup = () => {
 
     setError('');
 
-    // Signup API call
     try {
       const response = await axios.post('http://localhost:5001/api/auth/signup', {
         fullName: name,
@@ -48,16 +47,15 @@ const Signup = () => {
         password: password
       });
 
-      // Handle successful signup response
       if (response.data && response.data.error) {
         setError(response.data.message);
         return;
       }
 
       if (response.data && response.data.accessToken) {
-        const user= response.data.user;
+        const user = response.data.user;
 
-        login(response.data.accessToken,user);
+        login(response.data.accessToken, user);
         navigate('/');
       }
     } catch (error) {
@@ -70,56 +68,64 @@ const Signup = () => {
   };
 
   return (
-    <div className='flex items-center justify-center mt-24'>
-      <div className='w-96 bg-white border rounded-lg shadow-lg p-8'>
-        <h2 className='text-3xl font-semibold text-center mb-6'>Sign Up</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">Create an account</h2>
+        <p className="text-gray-500 text-center mb-6">Start your journey with us</p>
         <form onSubmit={handleSignup}>
-          <div className='mb-4'>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Full Name</label>
             <input
-              type='text'
-              placeholder='Enter your name'
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+              type="text"
+              placeholder="John Doe"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          <div className='mb-4'>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Email</label>
             <input
-              type='email'
-              placeholder='Enter your email'
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+              type="email"
+              placeholder="name@example.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          <div className='mb-4'>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Password</label>
             <PasswordInput
-              placeholder='Password'
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          <div className='mb-6'>
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-1">Confirm Password</label>
             <PasswordInput
-              placeholder='Confirm Password'
+              placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
-          {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-          <button type='submit' className='w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-primary-dark transition'>
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-800 transition"
+          >
             Sign Up
           </button>
 
-          <div className='text-center mt-4'>
-            <p className='text-sm'>
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-500">
               Already have an account?{' '}
-              <Link to='/login' className='text-primary font-medium hover:underline'>
+              <Link to="/login" className="text-gray-800 font-medium hover:underline">
                 Login
               </Link>
             </p>
