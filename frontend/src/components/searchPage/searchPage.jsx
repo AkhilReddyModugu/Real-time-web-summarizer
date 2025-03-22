@@ -46,7 +46,7 @@ export const SearchPage = () => {
                 },
             });
             setSearchResponse(response.data.summary);
-            setImageUrl(response.data.image_url);
+            setImageUrl(response.data.image_urls);
         } catch (error) {
             console.error('Error:', error);
             if (error.response) {

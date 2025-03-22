@@ -54,8 +54,10 @@ const ChatApp = () => {
       const response = await axios.post(`http://localhost:5001/api/chat/${selectedChat._id}/messages`, {
         sender: isUser ? 'user' : 'model',
         content: newMessage.text,
-        images: newMessage.image_urls, // Send images as part of the message
+        images: newMessage.images, // Send images as part of the message
       });
+
+      console.log(response.data);
   
       setSelectedChat((prevChat) => ({
         ...prevChat,

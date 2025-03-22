@@ -37,6 +37,7 @@ app.post('/api/summarize', async (req, res) => {
 
   try {
     const summarizationResponse = await axios.post(`${fastAPIServer}/summarize`, { query, length });
+    console.log(summarizationResponse.data.image_urls)
     res.json({
       summary: summarizationResponse.data.summary,
       image_urls: summarizationResponse.data.image_urls || []

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
-import { SearchPage } from './components/searchPage/searchPage';
+// import { SearchPage } from './components/searchPage/searchPage';
 import LoginPage from './pages/Login/Login';
 import SignupPage from './pages/Signup/Signup';
 import ContactPage from './pages/Contact/Contact';
@@ -35,12 +35,12 @@ const AppRoutes = () => {
         <Route path="/" 
           element={isLoggedIn ? <ChatApp /> : <Home />} 
         />
-        <Route path="/search" element={<SearchPage />} />
+        {/* <Route path="/search" element={<SearchPage />} /> */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/chat" element={<SearchPage/>} />
+        {/* <Route path="/chat" element={<SearchPage/>} /> */}
       </Routes>
     </div>
   );

@@ -32,6 +32,7 @@ const ChatInput = ({ onSendMessage }) => {
     try {
       const response = await axios.post(api, body);
       onSendMessage(response.data.summary, response.data.image_urls, false);
+      console.log(response.data);
     } catch (error) {
       console.error('Error:', error);
       if (error.response) {
