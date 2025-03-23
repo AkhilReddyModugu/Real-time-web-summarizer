@@ -1,17 +1,22 @@
 import os
-import json
 import re
 from dotenv import load_dotenv
-import aiohttp
+import aiohttp  
 from bs4 import BeautifulSoup
+import logging
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Function to search query and fetch results from Google's custom search
 async def search_query(search_term, length, api_key, search_engine_id):
     url = f'https://www.googleapis.com/customsearch/v1?q={search_term}&key={api_key}&cx={search_engine_id}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, ssl=False) as response:
+            if response.status != 200:
+                raise Exception(f"Search query failed with status code: {response.status}")
             results = await response.json()
             return results
 
@@ -19,30 +24,33 @@ async def search_query(search_term, length, api_key, search_engine_id):
 def extract_links(search_results):
     links = []
     for item in search_results.get('items', []):
-        links.append(item.get('link'))
+        link = item.get('link')
+        if link:
+            links.append(link)
     return links
 
 # Function to save links to a file
 def save_links_to_file(links, filename='output.txt'):
     try:
-        # Open the file in write mode to clear its contents before appending new links
-        with open(filename, 'w') as file:  # Open in write mode (clears the file)
+        with open(filename, 'w') as file:
             for link in links:
                 file.write(link + '\n')
     except Exception as e:
-        print(f"Error saving links to file: {e}")
+        logger.error(f"Error saving links to file: {e}")
 
-
-# Function to fetch and extract paragraphs from a URL
+# Function to fetch and extract paragraphs from a URL with per-request timeout
 async def fetch_and_extract_paragraphs(url):
+    PER_REQUEST_TIMEOUT = 5  # seconds
     try:
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=PER_REQUEST_TIMEOUT)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url) as response:
                 if response.status != 200:
-                    print(f"Failed to retrieve the page {url}")
+                    logger.warning(f"Failed to retrieve the page {url} with status {response.status}")
                     return None, None
                 
-                soup = BeautifulSoup(await response.text(), 'html.parser')
+                html_text = await response.text()
+                soup = BeautifulSoup(html_text, 'html.parser')
 
                 # Extract paragraphs
                 paragraphs = soup.find_all('p')
@@ -50,28 +58,25 @@ async def fetch_and_extract_paragraphs(url):
 
                 # Extract the first image URL (if any)
                 image_tag = soup.find('img')
-                image_url = image_tag['src'] if image_tag and 'src' in image_tag.attrs else None
+                image_url = image_tag['src'] if image_tag and image_tag.has_attr('src') else None
 
                 return text, image_url
+    except asyncio.TimeoutError:
+        logger.warning(f"Timeout while fetching {url}")
+        return None, None
     except Exception as e:
-        print(f"Error fetching {url}: {e}")
+        logger.error(f"Error fetching {url}: {e}")
         return None, None
 
 # Function to clean the text corpus
 def clean_text_corpus(corpus):
-    # Remove non-alphanumeric characters
     text = re.sub(r'[^A-Za-z0-9\s.,!?;:]', '', corpus)
-
-    # Remove URLs and emails
     text = re.sub(r'http\S+|www\S+', '', text)
     text = re.sub(r'\S+@\S+', '', text)
-
-    # Remove extra spaces
     text = ' '.join(text.split())
-
     return text
 
-# Function to summarize using Gemini model
+# Function to summarize using Gemini API
 async def gemini_summarizer(text, search_query, length):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent'
     params = {
@@ -90,7 +95,7 @@ async def gemini_summarizer(text, search_query, length):
         ### Requirements:
         - **Length**: Approximately {length} words.
         - **Emphasis**: Prioritize information corroborated by multiple sources; assign greater weight to frequently mentioned details.
-        - **Relevance**: If data appears inconsistent or irrelevant to the query, utilize your expertise to ensure the summary remains pertinent.
+        - **Relevance**: If data appears inconsistent or irrelevant to the query, ensure the summary remains pertinent.
         - **Format**: Provide the summary in plain text without special characters or HTML tags.
         - **Clarity**: Ensure the summary is coherent and easily understandable.
 
@@ -113,14 +118,16 @@ async def gemini_summarizer(text, search_query, length):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, headers=headers, params=params, json=body) as response:
-                response.raise_for_status()  # Check if request was successful
+                response.raise_for_status()
                 res_json = await response.json()
-                if 'candidates' in res_json:
-                    result = res_json['candidates'][0]['content']['parts'][0]['text']
-                    return result
+                candidates = res_json.get('candidates')
+                if candidates and isinstance(candidates, list) and candidates[0].get('content'):
+                    return candidates[0]['content']['parts'][0]['text']
                 else:
-                    return "Error: No candidates found in the response."
+                    logger.error("No valid candidates found in the summarization response.")
+                    return "Error: No summary could be generated."
         except Exception as e:
+            logger.error(f"Error in gemini_summarizer: {e}")
             return f"Error: {e}"
 
 # Main summarization function
@@ -129,7 +136,6 @@ async def llm_summarize(text, search_query, length):
 
 # Function to fetch image URLs using Google Custom Search API
 async def fetch_image_urls(query: str, API_KEY: str, SEARCH_ENGINE_ID: str):
-    """Fetch 3-4 image URLs for a given query using Google Custom Search API."""
     search_url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "key": API_KEY,
@@ -145,11 +151,11 @@ async def fetch_image_urls(query: str, API_KEY: str, SEARCH_ENGINE_ID: str):
             async with session.get(search_url, params=params) as response:
                 response.raise_for_status()
                 data = await response.json()
-                if "items" in data and data["items"]:
-                    image_urls = [item["link"] for item in data["items"]]
+                if "items" in data:
+                    image_urls = [item.get("link") for item in data["items"] if item.get("link")]
                 else:
-                    print("No image results found.")
+                    logger.info("No image results found.")
     except Exception as e:
-        print("Error fetching image URLs:", e)
+        logger.error(f"Error fetching image URLs: {e}")
     
     return image_urls
