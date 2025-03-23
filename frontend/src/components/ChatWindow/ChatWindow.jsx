@@ -62,18 +62,19 @@ const ChatWindow = ({ selectedChat, onSendMessage, onCreateNewChat }) => {
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div className={`max-w-[70%] space-y-2`}>
-                  {message.images && message.images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2">
-                      {message.images.map((img, idx) => (
+                {message.images && message.images.length > 0 && (
+                  <div className="grid grid-cols-3 gap-3">
+                    {message.images.map((img, idx) => (
+                      <div key={idx} className="overflow-hidden rounded-lg border border-gray-200">
                         <img
-                          key={idx}
                           src={img}
                           alt={`response-image-${idx}`}
-                          className="rounded-lg w-full h-48 object-cover"
+                          className="w-full h-50 object-contain"
                         />
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                   <div
                     className={`p-4 rounded-2xl ${
                       message.isUser
