@@ -2,6 +2,7 @@ import os
 import re
 from dotenv import load_dotenv
 import aiohttp  
+import asyncio
 from bs4 import BeautifulSoup
 import logging
 
